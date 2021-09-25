@@ -1,0 +1,11 @@
+{
+ "type": "sqlite",
+  "database": "build/infra/database/db.sqlite",
+  "entities": ["build/application/models/**.js"],
+  "migrations": ["build/infra/database/migrations/**.js"],
+  "logging": true,
+  "cli": {
+    "migrationsDir": "build/infra/database/migrations",
+    "entitiesDir": "build/infra/database/migrations"
+  }
+}
