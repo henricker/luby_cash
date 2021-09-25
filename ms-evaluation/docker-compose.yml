@@ -1,0 +1,15 @@
+
+version: '3'
+
+services:
+
+  ms_evaluation_db:
+    container_name: ms_evaluation_db
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment: 
+      POSTGRES_PASSWORD: ms_evaluation
+      POSTGRES_USER: ms_evaluation
+      POSTGRES_DB: ms_evaluation
