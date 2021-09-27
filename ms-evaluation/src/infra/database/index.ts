@@ -1,10 +1,14 @@
-import { Connection, createConnection, getConnectionOptions } from "typeorm";
+import { Client, Pool } from 'pg'
 
-export default async (): Promise<Connection> => {
-  const defaultOptions = await getConnectionOptions();
-  return createConnection(
-    Object.assign(defaultOptions, {
-      database: process.env.NODE_ENV === 'test' ? "./src/database/db.test.sqlite" : defaultOptions.database
-    })
-  );
-}
+export default (): Client => new Client({
+  host: 'localhost',
+  port: 5432,
+  user: 'ms_evaluation',
+  password: 'ms_evaluation',
+  database: 'ms_evaluation',
+})
+
+
+
+
+
