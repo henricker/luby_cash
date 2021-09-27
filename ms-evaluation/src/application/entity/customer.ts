@@ -1,27 +1,26 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  CreateDateColumn,
-} from 'typeorm'
+interface ICreateCustomer {
+  name: string
+  email: string
+  average_salary: number
+  status: boolean
+  id?: number
+}
 
-@Entity({ name: 'customers' })
-export class Customer {
-  @PrimaryGeneratedColumn()
-  public id: number
+export default class Customer {
 
-  @Column()
+  public id?: number
   public name: string
-
-  @Column()
   public email: string
-
-  @Column({ name: 'average_salary' })
-  public averageSalary: number
-
-  @Column()
+  public average_salary: number
   public status: boolean
-
-  @CreateDateColumn({ name: 'created_at' })
-  public createdAt: Date
+  public created_at: Date
+  
+  constructor({ name, average_salary, email, status, id }: ICreateCustomer) {
+    this.name = name
+    this.email = email
+    this.average_salary = average_salary
+    this.created_at = new Date()
+    this.status = status
+    id ? this.id = id : ''
+  }
 }
