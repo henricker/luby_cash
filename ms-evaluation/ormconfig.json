@@ -6,7 +6,6 @@
    "password": "ms_evaluation",
    "database": "ms_evaluation",
    "synchronize": true,
-   "logging": true,
    "entities": [
       "src/application/entity/**/*.ts"
    ],
