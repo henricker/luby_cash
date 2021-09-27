@@ -1,9 +1,3 @@
-import 'reflect-metadata'
-import {createConnection} from 'typeorm';
+import app from "./app";
 
-createConnection().then(async () => {
-  const app = await import('./app')
-  app.default.listen(3333)
-})
-
-
+app.listen(3333, () => console.log('running on port 3333'))
