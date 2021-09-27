@@ -15,15 +15,14 @@
       "express": "^4.17.1",
       "kafkajs": "^1.15.0",
       "mysql": "^2.14.1",
-      "pg": "^8.7.1",
-      "reflect-metadata": "^0.1.10",
-      "typeorm": "0.2.37"
+      "pg": "^8.7.1"
    },
    "devDependencies": {
       "@types/express": "^4.17.13",
       "@types/jest": "^27.0.2",
       "@types/kafkajs": "^1.9.0",
       "@types/node": "^8.0.29",
+      "@types/pg": "^8.6.1",
       "jest": "^27.2.2",
       "ts-jest": "^27.0.5",
       "ts-node": "3.3.0",
