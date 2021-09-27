@@ -1,5 +1,5 @@
 import { getCustomRepository } from "typeorm";
-import { Customer } from "../../src/application/entity/Customer";
+import { Customer } from "../../src/application/entity/customer";
 import { CustomerRepository } from "../../src/application/repository/customer-repository";
 import { CustomerService } from "../../src/application/services/customer-service"
 
