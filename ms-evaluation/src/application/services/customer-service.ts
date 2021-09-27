@@ -17,6 +17,11 @@ export class CustomerService {
     await this.customerRepository.save(customer)
   }
 
+  public async index(take: number = 10, skip: number = 1) {
+    const customers = await this.customerRepository.find({ take, skip })
+    return customers
+  }
+
   private evaluation(averageSalary: number): boolean {
     return averageSalary < 500 ? false : true
   }
