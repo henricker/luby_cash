@@ -1,6 +1,7 @@
 import Customer from "../../src/application/entity/customer";
 import { CustomerRepository } from "../../src/application/repository/customer-repository";
 import { CustomerService } from "../../src/application/services/customer-service"
+import Producer from "../../src/infra/kafka/producer";
 
 describe('#CustomerService', () => {
   describe('#evaluation', () => {
@@ -23,6 +24,9 @@ describe('#CustomerService', () => {
       CustomerService.prototype['customerRepository'] = new CustomerRepository()
       jest.spyOn(CustomerService.prototype['customerRepository'], 'create').mockImplementation().mockResolvedValue(customer)
       jest.spyOn(CustomerService.prototype as any, 'evaluation')
+      jest.spyOn(Producer.prototype, 'connect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'disconect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'sendMessage').mockImplementation()
       const testCustomer = await CustomerService.prototype['store']({ name: 'henricker', email: 'henricker@email.com', averageSalary: 5000 })
       expect(CustomerService.prototype['evaluation']).toReturnWith(true)
       expect(CustomerService.prototype['customerRepository'].create).toBeCalled()
@@ -33,6 +37,9 @@ describe('#CustomerService', () => {
       CustomerService.prototype['customerRepository'] = new CustomerRepository()
       jest.spyOn(CustomerService.prototype['customerRepository'], 'create').mockImplementation().mockResolvedValue(customer)
       jest.spyOn(CustomerService.prototype as any, 'evaluation')
+      jest.spyOn(Producer.prototype, 'connect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'disconect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'sendMessage').mockImplementation()
       const testCustomer = await CustomerService.prototype['store']({ name: 'henricker', email: 'henricker@email.com', averageSalary: 499 })
       expect(CustomerService.prototype['evaluation']).toReturnWith(false)
       expect(CustomerService.prototype['customerRepository'].create).toBeCalled()

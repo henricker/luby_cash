@@ -4,6 +4,7 @@ import CustomerController from '../../src/application/api/controller/customer-co
 import Customer from '../../src/application/entity/customer'
 import { CustomerRepository } from '../../src/application/repository/customer-repository'
 import { CustomerService } from '../../src/application/services/customer-service'
+import Producer from '../../src/infra/kafka/producer'
 
 describe('CustomerController', () => {
   describe('#store', () => {
@@ -14,6 +15,9 @@ describe('CustomerController', () => {
     test('should call store method of service, create method of repository, and query method of client postgres, when store method of controller is called', async () => {
       jest.spyOn(Client.prototype, 'connect').mockImplementation()
       jest.spyOn(Client.prototype, 'end').mockImplementation()
+      jest.spyOn(Producer.prototype, 'connect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'disconect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'sendMessage').mockImplementation()
 
       const customerMockedClientPg: QueryResult<any> = {
         rows: [
@@ -51,9 +55,10 @@ describe('CustomerController', () => {
       jest.spyOn(Client.prototype, 'connect').mockImplementation()
       jest.spyOn(Client.prototype, 'end').mockImplementation()
 
+      const dateCreated = new Date()
       const customerMockedClientPg: QueryResult<any> = {
         rows: [
-          { name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1, created_at: new Date() }
+          { name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1, created_at: dateCreated }
         ],
         command: '',
         rowCount: 1,
@@ -84,7 +89,7 @@ describe('CustomerController', () => {
             average_salary: 5000, 
             status: true, 
             id: 1, 
-            createdAt: new Date()
+            created_at: dateCreated
         })
       })
     })
@@ -159,11 +164,11 @@ describe('CustomerController', () => {
         await CustomerController.prototype.index(request, response)
         expect(response.send).toBeCalledWith({ 
           customers: [
-            new Customer({ name: 'Joe Doe', email: 'Doe@email.com', average_salary: 6000, status: true, id: 1, createdAt: dateCreated }),
-            new Customer({ name: 'Doe Joe', email: 'Joe@email.com', average_salary: 500, status: true, id: 2, createdAt: dateCreated }),
-            new Customer({ name: 'Timber Mcarty', email: 'timber@email.com', average_salary: 300, status: false, id: 3, createdAt: dateCreated }),
-            new Customer({ name: 'Lucian', email: 'lucian@email.com', average_salary: 200, status: false, id: 4, createdAt: dateCreated }),
-            new Customer({ name: 'Dr mundo', email: 'dr@email.com', average_salary: 8000, status: true, id: 6, createdAt: dateCreated })
+            new Customer({ name: 'Joe Doe', email: 'Doe@email.com', average_salary: 6000, status: true, id: 1, created_at: dateCreated }),
+            new Customer({ name: 'Doe Joe', email: 'Joe@email.com', average_salary: 500, status: true, id: 2, created_at: dateCreated }),
+            new Customer({ name: 'Timber Mcarty', email: 'timber@email.com', average_salary: 300, status: false, id: 3, created_at: dateCreated }),
+            new Customer({ name: 'Lucian', email: 'lucian@email.com', average_salary: 200, status: false, id: 4, created_at: dateCreated }),
+            new Customer({ name: 'Dr mundo', email: 'dr@email.com', average_salary: 8000, status: true, id: 6, created_at: dateCreated })
           ] 
         })
       })
