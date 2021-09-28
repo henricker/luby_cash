@@ -73,7 +73,7 @@ describe('#CustomerRepository', () => {
         jest.spyOn(Client.prototype, 'query').mockImplementation((text, values) => {
           return customerMockedClientPg
         })
-        const customer: Customer = new Customer({ name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1 })
+        const customer: Customer = new Customer({ name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1, created_at: dateCreated })
         const customerRepository = new CustomerRepository()
         const testingCustomer = await customerRepository.findById(1)
         expect(testingCustomer).toStrictEqual(customer)
