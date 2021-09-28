@@ -13,7 +13,7 @@ export class CustomerService {
 
   public async store({ name, email, averageSalary }: ICreateCustomer): Promise<Customer> {
     const status = this.evaluation(averageSalary)
-    const customer = this.customerRepository.create({ name, email, average_salary: averageSalary, status, created_at: new Date() })
+    const customer = await this.customerRepository.create({ name, email, average_salary: averageSalary, status, created_at: new Date() })
     return customer
   }
 
