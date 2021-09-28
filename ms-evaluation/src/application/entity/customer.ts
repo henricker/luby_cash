@@ -3,7 +3,8 @@ interface ICreateCustomer {
   email: string
   average_salary: number
   status: boolean
-  id?: number
+  id?: number,
+  createdAt?: Date
 }
 
 export default class Customer {
@@ -15,11 +16,11 @@ export default class Customer {
   public status: boolean
   public created_at: Date
   
-  constructor({ name, average_salary, email, status, id }: ICreateCustomer) {
+  constructor({ name, average_salary, email, status, id, createdAt }: ICreateCustomer) {
     this.name = name
     this.email = email
     this.average_salary = average_salary
-    this.created_at = new Date()
+    createdAt ? this.created_at = createdAt : this.created_at = new Date()
     this.status = status
     id ? this.id = id : ''
   }
