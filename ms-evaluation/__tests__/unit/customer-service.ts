@@ -81,11 +81,11 @@ describe('#CustomerService', () => {
 
       expect(testingCustomer).toStrictEqual(customer)
     })
-    test('should return user with by id', async () => {
+    test('should call findById method of repository when findById method of customer service is called', async () => {
       const customer: Customer = new Customer({ name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1 })
       CustomerService.prototype['customerRepository'] = new CustomerRepository()
       jest.spyOn(CustomerService.prototype['customerRepository'], 'findById').mockImplementation().mockResolvedValue(customer)
-      const testingCustomer = await CustomerService.prototype.show(1)
+      await CustomerService.prototype.show(1)
 
       expect(CustomerService.prototype['customerRepository'].findById).toBeCalled()
     })
