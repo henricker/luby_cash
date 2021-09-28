@@ -1,3 +1,4 @@
+import Producer from "../../infra/kafka/producer";
 import Customer from "../entity/customer";
 import { CustomerRepository } from "../repository/customer-repository";
 
@@ -14,6 +15,24 @@ export class CustomerService {
   public async store({ name, email, averageSalary }: ICreateCustomer): Promise<Customer> {
     const status = this.evaluation(averageSalary)
     const customer = await this.customerRepository.create({ name, email, average_salary: averageSalary, status, created_at: new Date() })
+
+    const producer = new Producer()
+    await producer.connect()
+
+    await producer.sendMessage(
+      [
+        {
+          value: JSON.stringify({ 
+            user: { 
+              status: customer.status, 
+              statusCreatedAt: customer.created_at, 
+              email: customer.email } 
+            })
+        }
+      ], 'confirmation-evaluation-event')
+
+    await producer.disconect()
+
     return customer
   }
 
