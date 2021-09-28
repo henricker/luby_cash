@@ -31,7 +31,7 @@ export class CustomerService {
         }
       ], 'confirmation-evaluation-event')
 
-    await producer.disconect()
+    await producer.disconnect()
 
     return customer
   }
