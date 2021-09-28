@@ -8,7 +8,7 @@ export default class Producer {
     await this.producer.connect()
   }
 
-  public async disconect() {
+  public async disconnect() {
     await this.producer.disconnect()
   }
 
