@@ -16,7 +16,7 @@ describe('CustomerController', () => {
       jest.spyOn(Client.prototype, 'connect').mockImplementation()
       jest.spyOn(Client.prototype, 'end').mockImplementation()
       jest.spyOn(Producer.prototype, 'connect').mockImplementation()
-      jest.spyOn(Producer.prototype, 'disconect').mockImplementation()
+      jest.spyOn(Producer.prototype, 'disconnect').mockImplementation()
       jest.spyOn(Producer.prototype, 'sendMessage').mockImplementation()
 
       const customerMockedClientPg: QueryResult<any> = {
