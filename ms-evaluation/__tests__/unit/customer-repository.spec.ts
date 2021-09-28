@@ -7,11 +7,13 @@ describe('#CustomerRepository', () => {
 
   const dateCreated = new Date()
   describe('#create', () => {
-    jest.spyOn(Client.prototype, 'connect').mockImplementation()
-    jest.spyOn(Client.prototype, 'end').mockImplementation()
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
 
     test('should be create a customer', async () => {
-
+      jest.spyOn(Client.prototype, 'connect').mockImplementation()
+      jest.spyOn(Client.prototype, 'end').mockImplementation()
       const dateCreated = new Date()
       const customerMockedClientPg: QueryResult<any> = {
         rows: [
@@ -51,29 +53,30 @@ describe('#CustomerRepository', () => {
   })
 
   describe('#findById', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+      test('should be return a customer', async () => {
         jest.spyOn(Client.prototype, 'connect').mockImplementation()
         jest.spyOn(Client.prototype, 'end').mockImplementation()
-
-        test('should be return a customer', async () => {
-
-          const dateCreated = new Date()
-          const customerMockedClientPg: QueryResult<any> = {
-            rows: [
-              { name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1, created_at: dateCreated }
-            ],
-            command: '',
-            rowCount: 1,
-            oid: 0,
-            fields: []
-          }
-      
-          jest.spyOn(Client.prototype, 'query').mockImplementation((text, values) => {
-            return customerMockedClientPg
-          })
-          const customer: Customer = new Customer({ name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1 })
-          const customerRepository = new CustomerRepository()
-          const testingCustomer = await customerRepository.findById(1)
-          expect(testingCustomer).toStrictEqual(customer)
+        const dateCreated = new Date()
+        const customerMockedClientPg: QueryResult<any> = {
+          rows: [
+            { name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1, created_at: dateCreated }
+          ],
+          command: '',
+          rowCount: 1,
+          oid: 0,
+          fields: []
+        }
+    
+        jest.spyOn(Client.prototype, 'query').mockImplementation((text, values) => {
+          return customerMockedClientPg
+        })
+        const customer: Customer = new Customer({ name: 'henricker', email: 'henricker@email.com', average_salary: 5000, status: true, id: 1 })
+        const customerRepository = new CustomerRepository()
+        const testingCustomer = await customerRepository.findById(1)
+        expect(testingCustomer).toStrictEqual(customer)
       })
 
       test('should be return undefined when customer not exists', async () => {
@@ -96,6 +99,9 @@ describe('#CustomerRepository', () => {
         expect(testingCustomer).toStrictEqual(undefined)
     })
   describe('#find', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
     test('should return customers', async () => {
       jest.spyOn(Client.prototype, 'connect').mockImplementation()
       jest.spyOn(Client.prototype, 'end').mockImplementation()
