@@ -21,7 +21,7 @@
       "@types/express": "^4.17.13",
       "@types/jest": "^27.0.2",
       "@types/kafkajs": "^1.9.0",
-      "@types/node": "^8.0.29",
+      "@types/node": "^8.10.66",
       "@types/pg": "^8.6.1",
       "jest": "^27.2.2",
       "ts-jest": "^27.0.5",
