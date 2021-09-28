@@ -1,9 +1,10 @@
 import { Consumer as KafkaConsumer, ConsumerSubscribeTopic } from 'kafkajs'
-import KafkaService from './kafka-service'
+import kafka from './kafka'
+import KafkaConsumerContract from './consumer-contract'
 
 export default class Consumer {
 
-  constructor(private kafkaConsumer: KafkaConsumer) {}
+  constructor(private kafkaConsumer: KafkaConsumer = kafka.consumer({ allowAutoTopicCreation: true, groupId: 'ms_evaluation' })) {}
 
   async connect(): Promise<void> {
     await this.kafkaConsumer.connect()
@@ -17,13 +18,13 @@ export default class Consumer {
     topics.forEach(async (options) => await this.kafkaConsumer.subscribe({ ...options  }))
   }
 
-  async run(service: KafkaService) {
+  async run(contract: KafkaConsumerContract) {
     await this.kafkaConsumer.run({
       eachMessage: async ({ message, partition, topic }) => {
-        if(topic !== service.topic)
+        if(topic !== contract.topic)
           return
           
-        service.handler({ message, partition, topic })
+        contract.handler({ message, partition, topic })
       }
     })
   }
