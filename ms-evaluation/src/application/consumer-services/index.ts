@@ -1,23 +1,30 @@
-import { EachMessagePayload } from "kafkajs";
+import { readdirSync } from "fs";
+import { ConsumerSubscribeTopic } from "kafkajs";
 import Consumer from "../../infra/kafka/consumer";
-import Producer from "../../infra/kafka/producer";
-import createCustomerConsumerContract from "./create-customer";
+import KafkaConsumerContract from "../../infra/kafka/consumer-contract";
 
 (async () => {
-  // const producer = new Producer()
-
-  // await producer.connect()
-  // await producer.sendMessage([
-  //   {
-  //     value: 'hello babe'
-  //   },
-  // ], 'evaluation-event')
-  // await producer.disconect()
-
   const consumer = new Consumer()
+
+  const consumers = await Promise.all(readdirSync(__dirname)
+  .filter((filename) => !/index.[ts, js]/.test(filename))
+  .map(async (filename) => {
+    const consumerObject = await import(`./${filename}`)
+    return consumerObject.default
+  }))
+
+  const topicsToSubscribe = consumers.map((consumerobject: KafkaConsumerContract) => {
+    const topicPayload: ConsumerSubscribeTopic = {
+      topic: consumerobject.topic
+    }
+
+    return topicPayload
+  })
+
   await consumer.connect()
+  await consumer.subscribe(topicsToSubscribe)
 
-  await consumer.subscribe([ { topic: 'evaluation-event' }])
-  await consumer.run(createCustomerConsumerContract)
-
+  for await (let consumerObject of consumers) {
+    await consumer.run(consumerObject)
+  }
 })()
