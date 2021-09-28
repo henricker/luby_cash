@@ -4,11 +4,11 @@ services:
 
   api:
     container_name: luby_cash_api
-    build: .
+    build: api
     image: luby_cash_api
     volumes: 
-      - .:/usr/app/api
-      - ./node_modules:/usr/app/api/node_modules
+      - ./api:/usr/app/api
+      - ./api/node_modules:/usr/app/api/node_modules
     ports: 
       - "3333:3333"
     command: npm run dev
@@ -16,7 +16,7 @@ services:
       - db
     links:
       - db
-
+  
   db:
     container_name: api_db
     image: postgres
@@ -27,4 +27,16 @@ services:
       POSTGRES_PASSWORD: luby_cash
       POSTGRES_USER: luby_cash
       POSTGRES_DB: luby_cash_db
+  
+  ms_evaluation_db:
+    container_name: ms_evaluation_db
+    image: postgres
+    restart: always
+    ports:
+      - "5555:5432"
+    environment: 
+      POSTGRES_PASSWORD: ms_evaluation
+      POSTGRES_USER: ms_evaluation
+      POSTGRES_DB: ms_evaluation
+
 
