@@ -10,7 +10,7 @@ describe('CustomerController', () => {
       jest.restoreAllMocks()
     })
 
-    test('should call service store method and create method of repository ', async () => {
+    test('should call service store method and create method of repository when store method of controller is called', async () => {
       jest.spyOn(Client.prototype, 'connect').mockImplementation()
       jest.spyOn(Client.prototype, 'end').mockImplementation()
 
