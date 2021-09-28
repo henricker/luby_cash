@@ -1,3 +1,3 @@
 import app from "./app";
 
-app.listen(3333, () => console.log('running on port 3333'))
+app.listen(3030, () => console.log('running on port 3030'))
