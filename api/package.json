@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node ace serve --watch",
+    "dev": "bash init.sh && node ace serve --watch",
     "build": "node ace build --production",
     "start": "node server.js",
     "lint": "eslint . --ext=.ts",
@@ -29,6 +29,7 @@
     "prettier": "^2.4.1",
     "sqlite3": "^5.0.2",
     "supertest": "^6.1.6",
+    "ts-node": "^10.2.1",
     "typescript": "~4.2",
     "youch": "^2.2.2",
     "youch-terminal": "^1.1.1"
