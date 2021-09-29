@@ -1,16 +1,9 @@
 import { DateTime } from 'luxon'
-import {
-  afterSave,
-  BaseModel,
-  beforeSave,
-  BelongsTo,
-  belongsTo,
-  column,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Role from './Role'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Status } from './enum/status'
-import Producer from 'kafka/producer'
+import Producer from '../../kafka/producer'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -80,25 +73,27 @@ export default class User extends BaseModel {
     }
   }
 
-  @afterSave()
+  @beforeSave()
   public static async evaluation(user: User) {
-    const producer = new Producer()
+    if (user.$dirty.cpfNumber && process.env.NODE_ENV !== 'testing') {
+      const producer = new Producer()
 
-    await producer.connect()
+      await producer.connect()
 
-    await producer.sendMessage(
-      [
-        {
-          value: JSON.stringify({
-            name: user.fullName,
-            email: user.email,
-            averageSalary: user.averageSalary,
-          }),
-        },
-      ],
-      'evaluation-event'
-    )
+      await producer.sendMessage(
+        [
+          {
+            value: JSON.stringify({
+              name: user.fullName,
+              email: user.email,
+              averageSalary: user.averageSalary,
+            }),
+          },
+        ],
+        'evaluation-event'
+      )
 
-    await producer.disconect()
+      await producer.disconect()
+    }
   }
 }
