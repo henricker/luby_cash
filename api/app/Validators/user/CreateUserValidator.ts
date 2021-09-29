@@ -10,7 +10,7 @@ export default class CreateUserValidator {
       rules.cpf(),
       rules.unique({ table: 'users', column: 'cpf_number' }),
     ]),
-    phone: schema.string(),
+    phone: schema.string({}, [rules.unique({ column: 'phone', table: 'users' })]),
     city: schema.string(),
     state: schema.string(),
     zipcode: schema.string(),
