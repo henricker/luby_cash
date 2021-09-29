@@ -16,6 +16,7 @@
   "preloads": [
     "./start/routes",
     "./start/kernel",
+    "./start/consumer",
     {
       "file": "./start/validator",
       "environment": [
