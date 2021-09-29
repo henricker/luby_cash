@@ -75,7 +75,7 @@ export default class User extends BaseModel {
 
   @beforeSave()
   public static async evaluation(user: User) {
-    if (user.$dirty.cpfNumber && process.env.NODE_ENV !== 'testing') {
+    if (user.$dirty.cpfNumber && process.env.NODE_ENV !== 'testing' && user.$dirty.roleId !== 1) {
       const producer = new Producer()
 
       await producer.connect()
