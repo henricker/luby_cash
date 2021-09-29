@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import KafkaConsumerContract from '../../kafka/consumer-service-contract'
 import { Status } from 'App/Models/enum/status'
 
-class CreateCustomerConsumerContract implements KafkaConsumerContract {
+class EvaluationCustomerConsumer implements KafkaConsumerContract {
   public topic: string = 'confirmation-evaluation-event'
   public async handler({ message }: EachMessagePayload): Promise<void> {
     try {
@@ -33,5 +33,5 @@ class CreateCustomerConsumerContract implements KafkaConsumerContract {
   }
 }
 
-const createCustomerConsumerContract = new CreateCustomerConsumerContract()
+const createCustomerConsumerContract = new EvaluationCustomerConsumer()
 export default createCustomerConsumerContract
