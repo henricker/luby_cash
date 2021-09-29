@@ -20,7 +20,7 @@ export default class Customer {
     this.name = name
     this.email = email
     this.average_salary = average_salary
-    created_at ? this.created_at = created_at : this.created_at = new Date()
+    created_at ? this.created_at = created_at : ''
     this.status = status
     id ? this.id = id : ''
   }
