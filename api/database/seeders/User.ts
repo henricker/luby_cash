@@ -6,16 +6,16 @@ export default class UserSeeder extends BaseSeeder {
     await User.create({
       roleId: 1,
       fullName: 'default admin',
-      address: '',
-      city: '',
-      state: '',
+      address: 'address',
+      city: 'city',
+      state: 'state',
       password: '123',
-      phone: '',
-      cpfNumber: '',
+      phone: 'phone',
+      cpfNumber: 'cpfNumber',
       averageSalary: 213,
       currentBalance: 231,
       email: 'henricker@email.com',
-      zipcode: '',
+      zipcode: '12332145',
     })
   }
 }
