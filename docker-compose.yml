@@ -2,20 +2,20 @@ version: '3'
 
 services:
 
-  api:
-    container_name: luby_cash_api
-    build: api
-    image: luby_cash_api
-    volumes: 
-      - ./api:/usr/app/api
-      - ./api/node_modules:/usr/app/api/node_modules
-    ports: 
-      - "3333:3333"
-    command: npm run dev
-    depends_on:
-      - db
-    links:
-      - db
+  # api:
+  #   container_name: luby_cash_api
+  #   build: api
+  #   image: luby_cash_api
+  #   volumes: 
+  #     - ./api:/usr/app/api
+  #     - ./api/node_modules:/usr/app/api/node_modules
+  #   ports: 
+  #     - "3333:3333"
+  #   command: npm run dev
+  #   depends_on:
+  #     - db
+  #   links:
+  #     - db
   
   db:
     container_name: api_db
@@ -63,5 +63,12 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_CREATE_TOPICS: "issue-certificate:1:1,email-handler:1:1"
+
+  redis:
+    container_name: redis_queue
+    image: 'redis:alpine'
+    restart: always
+    ports: 
+      - "6379:6379"
 
 
