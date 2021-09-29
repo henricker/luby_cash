@@ -6,7 +6,7 @@ export default class Consumer {
   constructor(
     private kafkaConsumer: KafkaConsumer = kafka.consumer({
       allowAutoTopicCreation: true,
-      groupId: 'ms_evaluation',
+      groupId: 'evaluated_users',
     })
   ) {}
 
