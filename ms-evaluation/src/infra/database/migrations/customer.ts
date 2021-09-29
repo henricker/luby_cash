@@ -13,7 +13,7 @@ class CreateUser {
       average_salary DECIMAL(8, 2) NOT NULL,
       email VARCHAR NOT NULL, 
       status BOOLEAN NOT NULL, 
-      created_at TIMESTAMP NOT NULL
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`
     await client.query(query)
     await client.end()
