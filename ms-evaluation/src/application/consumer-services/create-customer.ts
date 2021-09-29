@@ -9,7 +9,7 @@ class CreateCustomerConsumerContract implements KafkaConsumerContract{
   constructor(private customerService: CustomerService = new CustomerService()) {}
 
   topic: string = 'evaluation-event'
-  async handler({message, topic, partition}: EachMessagePayload): Promise<void> {
+  async handler({ message }: EachMessagePayload): Promise<void> {
     try {
       const payload = JSON.parse(message.value.toString())
 
