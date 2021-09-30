@@ -1,0 +1,30 @@
+<style>
+  .approved {
+      background-color: #B5C401;
+      padding: 2rem;
+  }
+
+  .disapproved {
+      background-color: #fd7575;
+      padding: 2rem;
+  }
+</style>
+
+{{> header }} 
+{{#> container }}
+    {{#> content }}
+      <h2>Hi, {{ name }}!<h2>
+      </br>
+      {{#if status}}
+        <p class="approved" style="color: #FFF">Congratulations, you have been approved to be our customer :D!!</p>
+      {{else}}
+        <p class="disapproved" style="color: #FFF">Unfortunately you have not been selected to be our customer.</p>
+      {{/if}}
+    {{/content}}
+    {{#if status}}
+      {{> subcontent text="Click below to see all LubyCash services ;)" link="https://lubycash.com/services" button-text="Our services" }}
+    {{else}}
+      {{> subcontent text="But don't worry, we still have other cool services!;)" link="https://lubycash.com/services" button-text="Others services" }}
+    {{/if}}
+{{/container }}
+{{> footer }} 
