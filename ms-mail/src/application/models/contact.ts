@@ -1,6 +1,6 @@
 export default interface IContact {
   name: string
   email: string
-  status?: string
+  status?: boolean
   remember_me_token?: string
 }
