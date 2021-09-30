@@ -24,6 +24,7 @@ class EvaluationCustomerConsumer implements KafkaConsumerContract {
       user.merge({
         status: userPayload.status ? Status.APPROVED : Status.DISAPPROVED,
         statusDate: DateTime.fromJSDate(new Date(userPayload.statusCreatedAt)),
+        currentBalance: 200,
       })
 
       await user.save()
