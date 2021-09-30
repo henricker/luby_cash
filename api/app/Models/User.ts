@@ -1,5 +1,13 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeSave, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  afterCreate,
+  BaseModel,
+  beforeSave,
+  beforeUpdate,
+  BelongsTo,
+  belongsTo,
+  column,
+} from '@ioc:Adonis/Lucid/Orm'
 import Role from './Role'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Status } from './enum/status'
@@ -73,26 +81,72 @@ export default class User extends BaseModel {
     }
   }
 
-  @beforeSave()
+  @afterCreate()
   public static async evaluation(user: User) {
-    if (user.$dirty.cpfNumber && process.env.NODE_ENV !== 'testing' && user.$dirty.roleId !== 1) {
+    if (process.env.NODE_ENV === 'testing' || user.$dirty.roleId === 1) return
+    const producer = new Producer()
+
+    await producer.connect()
+
+    await producer.sendMessage(
+      [
+        {
+          value: JSON.stringify({
+            name: user.fullName,
+            email: user.email,
+            averageSalary: user.averageSalary,
+          }),
+        },
+      ],
+      'evaluation-event'
+    )
+
+    await producer.disconect()
+  }
+
+  @afterCreate()
+  public static async sendWelcomeMail(user: User) {
+    if (process.env.NODE_ENV === 'testing' || user.$dirty.roleId === 1) return
+
+    const producer = new Producer()
+    await producer.connect()
+    await producer.sendMessage(
+      [
+        {
+          value: JSON.stringify({
+            contact: {
+              name: user.fullName,
+              email: user.email,
+            },
+            template: 'welcome-user',
+          }),
+        },
+      ],
+      'mailer-event'
+    )
+    await producer.disconect()
+  }
+
+  @beforeUpdate()
+  public static async sendForgotPasswordMail(user: User) {
+    if (user.$dirty.rememberMeToken && process.env.NODE_ENV !== 'testing') {
       const producer = new Producer()
-
       await producer.connect()
-
       await producer.sendMessage(
         [
           {
             value: JSON.stringify({
-              name: user.fullName,
-              email: user.email,
-              averageSalary: user.averageSalary,
+              contact: {
+                name: user.fullName,
+                email: user.email,
+                remember_me_token: user.rememberMeToken,
+              },
+              template: 'forgot-password',
             }),
           },
         ],
-        'evaluation-event'
+        'mailer-event'
       )
-
       await producer.disconect()
     }
   }
