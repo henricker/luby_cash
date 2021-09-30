@@ -4,7 +4,6 @@ class CreateUser {
   private tableName = 'customer'
 
   public async up() {
-    console.log(this.tableName)
     const client = getClient()
     await client.connect()
     const query = `CREATE TABLE ${this.tableName} ( 
@@ -28,6 +27,8 @@ class CreateUser {
   }
 }
 
-new CreateUser().up().then((value) => console.log('create table')).catch((err) => console.log(err.message))
+export default new CreateUser();
+
+//new CreateUser().down().then((value) => console.log('create table')).catch((err) => console.log(err.message))
 
 
