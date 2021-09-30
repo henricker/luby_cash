@@ -22,6 +22,22 @@ export class CustomerService {
     await producer.sendMessage(
       [
         {
+          value: JSON.stringify({
+            contact: {
+              name: customer.name,
+              email: customer.email,
+              status: customer.status,
+            },
+            template: 'evaluation-user'
+          })
+        }
+      ]
+    , 'mailer-event')
+
+
+    await producer.sendMessage(
+      [
+        {
           value: JSON.stringify({ 
             user: { 
               status: customer.status, 
