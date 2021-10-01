@@ -35,6 +35,12 @@ export default class PixesController {
     await userRecipient.save()
     await userIssuer.save()
 
+    await Pix.create({
+      transferValue: data.transfer_value,
+      issuerUser: userIssuer.id,
+      recipientUser: userRecipient.id,
+    })
+
     return response.status(201).send('Transfer successful')
   }
 
