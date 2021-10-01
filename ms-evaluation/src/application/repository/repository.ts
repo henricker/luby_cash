@@ -48,7 +48,8 @@ export abstract class Repository<T> {
   public async find({ page = 0, limit = 10 }: findOptions): Promise<T[]> {
     const client = getClient()
     await client.connect()
-    const query = `SELECT * FROM ${this.tableName} OFFSET ${page * limit} LIMIT ${limit}`
+  //  const query = `SELECT * FROM ${this.tableName} OFFSET ${page * limit} LIMIT ${limit}`
+    const query = `SELECT * FROM ${this.tableName}`
     const result = await client.query(query)
     await client.end()
 
