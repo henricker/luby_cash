@@ -1,0 +1,11 @@
+{{> header }} 
+{{#> container }}
+    {{#> content }}
+      <h2>Hi, {{ name }}!<h2>
+      </br>
+      <p>You made a R${{transferValue}} transfer to <span class="outline-green">{{ recipientName }}</span></p>
+      <p class="outline-green">Your current balance is R${{ currentBalance }}</p>
+    {{/content}}
+    {{> subcontent text="Click below to access our services" link="https://lubycash.com/dashboard" button-text="Dashboard" }}
+{{/container }}
+{{> footer }} 
