@@ -3,4 +3,8 @@ export default interface IContact {
   email: string
   status?: boolean
   remember_me_token?: string
+  currentBalance?: number
+  recipientName?: string
+  issuerName?: string
+  transferValue: number
 }
