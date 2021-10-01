@@ -84,6 +84,7 @@ export default class User extends BaseModel {
   @afterCreate()
   public static async evaluation(user: User) {
     if (process.env.NODE_ENV === 'testing' || user.$dirty.roleId === 1) return
+
     const producer = new Producer()
 
     await producer.connect()
@@ -101,7 +102,7 @@ export default class User extends BaseModel {
       'evaluation-event'
     )
 
-    await producer.disconect()
+    await producer.disconnect()
   }
 
   @afterCreate()
@@ -124,30 +125,29 @@ export default class User extends BaseModel {
       ],
       'mailer-event'
     )
-    await producer.disconect()
+    await producer.disconnect()
   }
 
   @beforeUpdate()
   public static async sendForgotPasswordMail(user: User) {
-    if (user.$dirty.rememberMeToken && process.env.NODE_ENV !== 'testing') {
-      const producer = new Producer()
-      await producer.connect()
-      await producer.sendMessage(
-        [
-          {
-            value: JSON.stringify({
-              contact: {
-                name: user.fullName,
-                email: user.email,
-                remember_me_token: user.rememberMeToken,
-              },
-              template: 'forgot-password',
-            }),
-          },
-        ],
-        'mailer-event'
-      )
-      await producer.disconect()
-    }
+    if (!user.$dirty.rememberMeToken || process.env.NODE_ENV === 'testing') return
+    const producer = new Producer()
+    await producer.connect()
+    await producer.sendMessage(
+      [
+        {
+          value: JSON.stringify({
+            contact: {
+              name: user.fullName,
+              email: user.email,
+              remember_me_token: user.rememberMeToken,
+            },
+            template: 'forgot-password',
+          }),
+        },
+      ],
+      'mailer-event'
+    )
+    await producer.disconnect()
   }
 }
