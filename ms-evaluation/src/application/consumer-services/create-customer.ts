@@ -1,7 +1,7 @@
 import { EachMessagePayload } from "kafkajs";
 import KafkaConsumerContract from "../../infra/kafka/consumer-contract";
 import { CustomerService } from "../services/customer-service";
-
+import Customer from "../entity/customer";
 //testing payload { "name": "henricker", "email": "henricker@email", "averageSalary": 500 }
 
 class CreateCustomerConsumerContract implements KafkaConsumerContract{
@@ -11,10 +11,11 @@ class CreateCustomerConsumerContract implements KafkaConsumerContract{
   topic: string = 'evaluation-event'
   async handler({ message }: EachMessagePayload): Promise<void> {
     try {
-      const payload = JSON.parse(message.value.toString())
+      const payload: Customer = JSON.parse(message.value.toString())
 
-      if(!payload.name || !payload.email || !payload.averageSalary)
+      if (!payload.full_name || !payload.email || !payload.average_salary || !payload.cpf_number || !payload.phone || !payload.address || !payload.state || !payload.city || !payload.zipcode || !payload.password) {
         throw new Error('invalid payload')
+      }
 
       console.log('Message received: ' + message.value.toString() + ' timestamps:' + message.timestamp)
       this.customerService.store({ ...payload })
