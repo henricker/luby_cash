@@ -9,8 +9,8 @@ Route.group(() => {
     .prefix('/pixes')
     .middleware(['auth'])
 
-  Route.post('/', 'UsersController.store')
-}).prefix('/users')
+  Route.post('/', 'CustomerController.store')
+}).prefix('/customers')
 
 Route.group(() => {
   Route.patch('/', 'ForgotPasswordController.store')
@@ -19,14 +19,17 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('/', 'AdminsController.index')
-  Route.patch('/promote/:userId', 'AdminsController.promote')
-  Route.patch('/demote/:userId', 'AdminsController.demote')
+  Route.post('/', 'AdminsController.store')
+  Route.delete('/:adminId', 'AdminsController.destroy')
+  Route.put('/:adminId', 'AdminsController.update')
+
   Route.group(() => {
-    Route.get('/', 'UsersController.index')
+    Route.get('/', 'CustomerController.index')
+    Route.get('/:cpf', 'CustomerController.show')
     Route.group(() => {
       Route.get('/', 'PixesController.index')
-    }).prefix('/:userId/pixes')
-  }).prefix('/users')
+    }).prefix('/:customerCPF/pixes')
+  }).prefix('/customers')
 })
   .prefix('/admins')
-  .middleware(['auth', 'authAdmin'])
+  .middleware(['auth'])
