@@ -70,7 +70,7 @@ export class CustomerService {
     }
   }
 
-  public async index(page: number = 0, limit: number = 10, where?: Partial<Customer>, dates?: dateFilter) {
+  public async index(page: number = 0, limit: number = 10, where?: Partial<Customer>, dates?: dateFilter | undefined) {
     const customers = await this.customerRepository.find({ page, limit }, where, dates)
     return customers
   }
