@@ -1,5 +1,6 @@
 import express from 'express'
 import routes from './routes'
+import cors, { CorsOptions } from 'cors'
 
 class App {
   express: express.Express
@@ -14,7 +15,11 @@ class App {
   }
 
   middlewares() {
+    const corsOptions: CorsOptions = {
+      origin: '*',
+    }
     this.express.use(express.json())
+    this.express.use(cors(corsOptions))
     return this
   }
 }
