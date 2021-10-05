@@ -1,64 +1,82 @@
 import Producer from "../../infra/kafka/producer";
 import Customer from "../entity/customer";
+import BcryptHelper from "../helpers/bcrypt";
 import { CustomerRepository } from "../repository/customer-repository";
+import { dateFilter } from "../repository/repository";
 
 interface ICreateCustomer {
-  name: string
+  full_name: string
   email: string
-  averageSalary: number
+  average_salary: number
+  cpf_number: string
+  phone: string
+  city: string
+  state: string
+  zipcode: string
+  address: string
+  password: string
 }
 
 export class CustomerService {
 
   constructor(private customerRepository: CustomerRepository = new CustomerRepository()) {}
 
-  public async store({ name, email, averageSalary }: ICreateCustomer): Promise<Customer> {
-    const status = this.evaluation(averageSalary)
-    const customer = await this.customerRepository.create({ name, email, average_salary: averageSalary, status, created_at: new Date() })
+  public async store({ full_name, email, average_salary, phone, city, state, zipcode, address, cpf_number, password }: ICreateCustomer): Promise<Customer> {
+    try {
+      const status = this.evaluation(average_salary)
+      const currentBalance = status ? 200 : 0
+      const passwordHashed = await BcryptHelper.hashing(password, 12)
+      const customer = await this.customerRepository.create({ full_name, phone, address, email, cpf_number, city, current_balance: currentBalance, state, zipcode, average_salary, status, created_at: new Date(), password: passwordHashed })
+  
+      const producer = new Producer()
+      await producer.connect()
 
-    const producer = new Producer()
-    await producer.connect()
-
-    await producer.sendMessage(
-      [
-        {
-          value: JSON.stringify({
-            contact: {
-              name: customer.name,
-              email: customer.email,
-              status: customer.status,
-            },
-            template: 'evaluation-user'
-          })
-        }
-      ]
-    , 'mailer-event')
-
-
-    await producer.sendMessage(
-      [
-        {
-          value: JSON.stringify({ 
-            user: { 
-              status: customer.status, 
-              statusCreatedAt: customer.created_at, 
-              email: customer.email } 
+      await producer.sendMessage(
+        [
+          {
+            value: JSON.stringify({
+              contact: {
+                name: customer.full_name,
+                email: customer.email,
+              },
+              template: 'welcome-user',
+            }),
+          },
+        ],
+        'mailer-event'
+      )
+  
+      await producer.sendMessage(
+        [
+          {
+            value: JSON.stringify({
+              contact: {
+                name: customer.full_name,
+                email: customer.email,
+                status: customer.status,
+              },
+              template: 'evaluation-user'
             })
-        }
-      ], 'confirmation-evaluation-event')
+          }
+        ]
+      , 'mailer-event')
 
-    await producer.disconnect()
-
-    return customer
+      await producer.disconnect()
+  
+      customer.password = undefined
+      return customer
+    } catch(err) {
+      console.log(err.message)
+    }
   }
 
-  public async index(page: number = 0, limit: number = 10) {
-    const customers = await this.customerRepository.find({ page, limit })
+  public async index(page: number = 0, limit: number = 10, where?: Partial<Customer>, dates?: dateFilter) {
+    const customers = await this.customerRepository.find({ page, limit }, where, dates)
     return customers
   }
  
-  public async show(id: number) {
-    const customer = await this.customerRepository.findById(id)
+  public async show(cpf: string) {
+    const customer = await this.customerRepository.findByCPF(cpf)
     
     if(!customer)
       throw new Error('customer not found')
@@ -69,5 +87,4 @@ export class CustomerService {
   private evaluation(averageSalary: number): boolean {
     return averageSalary < 500 ? false : true
   }
-
 }
