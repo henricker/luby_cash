@@ -5,7 +5,8 @@ const customerRouter = Router()
 const customerController = new CustomerController()
 
 customerRouter.get('/customers', customerController.index)
-customerRouter.get('/customers/:id', customerController.show)
+customerRouter.get('/customers/:cpf', customerController.show)
 customerRouter.post('/customers', customerController.store)
+customerRouter.put('/customers', customerController.update)
 
 export default customerRouter
