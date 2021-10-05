@@ -7,9 +7,6 @@ export default class RoleSeeder extends BaseSeeder {
       {
         role: 'admin',
       },
-      {
-        role: 'user',
-      },
     ])
   }
 }
