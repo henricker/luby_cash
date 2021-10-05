@@ -6,7 +6,7 @@ export default class RecoveryPasswordValidator {
 
   public schema = schema.create({
     token: schema.string({ trim: true }, [
-      rules.exists({ column: 'remember_me_token', table: 'users' }),
+      rules.exists({ column: 'remember_me_token', table: 'admins' }),
     ]),
     password: schema.string({ trim: true }, [
       rules.regex(
