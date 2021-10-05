@@ -85,9 +85,9 @@ export abstract class Repository<T> {
       })
     }
 
-    if(dateFilter) {
+    if(dateFilter)
       query += `AND created_at >= '${dateFilter.begin_date}' AND created_at <= '${dateFilter.end_date}'`
-    }
+    
     query += ` OFFSET ${ (page - 1 ) * limit } LIMIT ${limit}`
 
     console.log(query)
@@ -106,6 +106,6 @@ interface findOptions {
 }
 
 export interface dateFilter {
-  begin_date?: string
-  end_date?: string
+  begin_date?: string | undefined
+  end_date?: string | undefined
 }
