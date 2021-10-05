@@ -1,27 +1,37 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import User from 'App/Models/User'
+import Admin from 'App/Models/Admin'
+import CreateAdminValidator from 'App/Validators/admin/CreateAdminValidator'
+import UpdateAdminValidator from 'App/Validators/admin/UpdateAdminValidator'
 
 export default class AdminsController {
-  public async promote({ params, response }: HttpContextContract) {
-    const userId = params['userId']
-    const user = await User.findByOrFail('id', userId)
-    user.merge({ roleId: 1 })
-    await user.save()
-    return response.send(`User with id ${userId} has been promoted`)
+  public async store({ request, response }: HttpContextContract) {
+    const data = await request.validate(CreateAdminValidator)
+    const admin = await Admin.create({ ...data, roleId: 1 })
+    return response.status(201).send({ admin })
   }
 
-  public async demote({ params, response }: HttpContextContract) {
-    const userId = params['userId']
-    const user = await User.findByOrFail('id', userId)
-    user.merge({ roleId: 2 })
-    await user.save()
-    return response.send(`User with id ${userId} has been demoted`)
+  public async destroy({ params, response }: HttpContextContract) {
+    const adminId = params['adminId']
+    const admin = await Admin.query().where('id', adminId).andWhere('role_id', 1).firstOrFail()
+    await admin.delete()
+    return response.send({ message: 'admin deleted with success' })
+  }
+
+  public async update({ params, request, response }: HttpContextContract) {
+    const adminId = params['adminId']
+
+    const data = await request.validate(UpdateAdminValidator)
+    const admin = await Admin.query().where('id', adminId).andWhere('role_id', 1).firstOrFail()
+
+    admin.merge({ ...data })
+    await admin.save()
+    return response.send({ message: 'admin updated with success' })
   }
 
   public async index({ request, response }: HttpContextContract) {
     const { page, perPage } = request.qs()
 
-    const admins = await User.query()
+    const admins = await Admin.query()
       .where('roleId', 1)
       .paginate(page ?? 1, perPage ?? 10)
 
@@ -31,11 +41,6 @@ export default class AdminsController {
       id: admin.id,
       full_name: admin.full_name,
       email: admin.email,
-      phone: admin.phone,
-      cpf_number: admin.cpf_number,
-      city: admin.city,
-      state: admin.state,
-      zipcode: admin.zipcode,
       created_at: admin.created_at,
       updated_at: admin.updated_at,
     }))
