@@ -1,6 +1,6 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.post('/session', 'SessionController.store')
+// Route.post('/session', 'SessionController.store')
 
 Route.group(() => {
   Route.group(() => {
@@ -29,7 +29,8 @@ Route.group(() => {
     Route.group(() => {
       Route.get('/', 'PixesController.index')
     }).prefix('/:customerCPF/pixes')
-  }).prefix('/customers')
-})
-  .prefix('/admins')
-  .middleware(['auth'])
+  })
+    .prefix('/customers')
+    .middleware(['auth'])
+  Route.post('/session', 'SessionController.storeAdmin')
+}).prefix('/admins')
