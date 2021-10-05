@@ -8,10 +8,18 @@ class CreateUser {
     await client.connect()
     const query = `CREATE TABLE ${this.tableName} ( 
       id SERIAL PRIMARY KEY, 
-      name VARCHAR NOT NULL,
+      full_name VARCHAR NOT NULL,
       average_salary DECIMAL(8, 2) NOT NULL,
-      email VARCHAR NOT NULL, 
-      status BOOLEAN NOT NULL, 
+      email VARCHAR UNIQUE NOT NULL,
+      phone VARCHAR NOT NULL,
+      cpf_number VARCHAR(11)  UNIQUE NOT NULL,
+      address VARCHAR NOT NULL,
+      city VARCHAR NOT NULL,
+      state VARCHAR NOT NULL,
+      zipcode VARCHAR NOT NULL,
+      current_balance DECIMAL(8, 2) NOT NULL,
+      status BOOLEAN NOT NULL,
+      password VARCHAR NOT NULL, 
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`
     await client.query(query)
@@ -28,7 +36,4 @@ class CreateUser {
 }
 
 export default new CreateUser();
-
-//new CreateUser().down().then((value) => console.log('create table')).catch((err) => console.log(err.message))
-
 
