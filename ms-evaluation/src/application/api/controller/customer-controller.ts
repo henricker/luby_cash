@@ -10,31 +10,26 @@ export default class CustomerController {
 
   public async index(request: Request, response: Response) {
 
-    let { page, limit, status, begin_date, end_date } = request.query
+    let { page, limit, status, date } = request.query
     let pagination = Number(page)
     let limitation = Number(limit)
-    begin_date = String(begin_date)
-    end_date = String(end_date)
+    date = String(date)
 
     pagination = !page || pagination <= 0 || Number.isNaN(pagination) ? 1 : pagination
     limitation = !limitation || limitation <= 0 || Number.isNaN(pagination) ? 10 : limitation
     status = status === 'approved' || status === 'disapproved' ? status : 'approved'
 
- 
-    begin_date = /\d\d\d\d-\d\d-\d\d/g.test(begin_date) ? begin_date + ' 00:00:00' : moment().format('yyyy-MM-DD 00:00:00 A')
-    end_date = /\d\d\d\d-\d\d-\d\d/g.test(end_date) ? end_date + ' 23:59:59' : moment().format('yyyy-MM-DD hh:mm:ss A')
+    date = /\d\d\d\d-\d\d-\d\d/g.test(date) ? date + ' 00:00:00' : undefined
+    let endDate = date ? moment(date).format('yyyy-MM-DD 23:59:59') : undefined
 
-
-    const customers = await customerService.index(pagination, limitation, { status: status === 'approved' ? true : false }, { begin_date, end_date })
+    const customers = await customerService.index(pagination, limitation, { status: status === 'approved' ? true : false }, date ? { begin_date: date, end_date: endDate } : undefined)
     
-
     const responseData = {
       meta: {
         current_page: pagination,
         per_page: limitation,
         customer_status: status,
-        begin_date: begin_date,
-        end_date: end_date,
+        date: date ? date : 'no provided',
         customer_status_default: 'approved',
         page_default: 1,
         per_page_default: 10

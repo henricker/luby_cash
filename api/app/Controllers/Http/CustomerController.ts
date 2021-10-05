@@ -8,10 +8,10 @@ const MS_EVALUATION_ENDPOINT = 'http://localhost:3030'
 export default class CustomerController {
   public async index({ request, response }: HttpContextContract) {
     try {
-      let { status, page, perPage, beginDate, endDate } = request.qs()
+      let { status, page, perPage, date } = request.qs()
 
       const requestAxios = await axios.get(
-        `${MS_EVALUATION_ENDPOINT}/customers/?status=${status}&page=${page}&perPage=${perPage}&begin_date=${beginDate}&end_date=${endDate}`
+        `${MS_EVALUATION_ENDPOINT}/customers/?status=${status}&page=${page}&limit=${perPage}&date=${date}`
       )
       let customers: any[] = requestAxios.data['data']['customers']
       let meta: any[] = requestAxios.data['meta']
