@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import User from 'App/Models/User'
+import Admin from 'App/Models/Admin'
 import ForgotPasswordValidator from 'App/Validators/forgot-password/ForgotPasswordValidator'
 import RecoveryPasswordValidator from 'App/Validators/forgot-password/RecoveryPasswordValidator'
 import crypto from 'crypto'
@@ -7,9 +7,9 @@ import { DateTime } from 'luxon'
 import moment from 'moment'
 
 export default class ForgotPasswordsController {
-  public async store({ request }: HttpContextContract) {
+  public async storeAdmin({ request }: HttpContextContract) {
     const data = await request.validate(ForgotPasswordValidator)
-    const user = await User.findByOrFail('email', data.email)
+    const user = await Admin.findByOrFail('email', data.email)
 
     user.rememberMeToken = crypto.randomBytes(12).toString('hex')
     user.rememberMeTokenCreatedAt = DateTime.now()
@@ -19,19 +19,19 @@ export default class ForgotPasswordsController {
     return 'Check the token in your email'
   }
 
-  public async update({ request, response }: HttpContextContract) {
+  public async updateAdmin({ request, response }: HttpContextContract) {
     const { password, token } = await request.validate(RecoveryPasswordValidator)
-    const user = await User.findByOrFail('rememberMeToken', token)
+    const admin = await Admin.findByOrFail('rememberMeToken', token)
 
-    const tokenExpired = moment().subtract('2', 'days').isAfter(user.rememberMeTokenCreatedAt)
+    const tokenExpired = moment().subtract('2', 'days').isAfter(admin.rememberMeTokenCreatedAt)
 
     if (tokenExpired) return response.status(400).send({ errors: [{ message: 'token expired' }] })
 
-    user.rememberMeToken = null
-    user.rememberMeTokenCreatedAt = null
-    user.password = password
+    admin.rememberMeToken = null
+    admin.rememberMeTokenCreatedAt = null
+    admin.password = password
 
-    await user.save()
+    await admin.save()
     return 'password updated successfully!'
   }
 }
