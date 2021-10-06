@@ -7,4 +7,6 @@ export default interface Customer {
   created_at: Date
   status: boolean
   id: number
+  remember_me_token?: string
+  remember_me_token_created_at?: Date
 }
