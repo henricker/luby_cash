@@ -38,17 +38,20 @@ export abstract class Repository<T> {
     }
   }
 
-  public async findById(id: number): Promise<T | undefined> {
+  public async findBy({ fieldName, fieldValue }: findByOptions): Promise<T[] | T> {
     const client = getClient()
+
     await client.connect()
-    const query = `SELECT * FROM ${this.tableName} WHERE id = $1`
+    const query = `SELECT * FROM ${this.tableName} WHERE ${fieldName} = $1`
     console.log(query)
-    const values = [ id ]
+    const values = [ fieldValue ]
     const result = await client.query(query, values)
     await client.end()
-  
-    const entityObject = result.rows[0] ? new this.classEntity({ ...result.rows[0] }) : undefined
-    return entityObject
+
+    if(result.rows.length > 1)
+      return result.rows.map((row) => new this.classEntity({ ...row }))
+
+    return result.rows[0] ? new this.classEntity(...result.rows[0]) : undefined
   }
 
   public async update(fieldsToUpdate: Partial<T>, id: number): Promise<T> {
@@ -103,6 +106,11 @@ export abstract class Repository<T> {
 interface findOptions {
   page?: number
   limit?: number
+}
+
+interface findByOptions {
+  fieldName: string
+  fieldValue: any
 }
 
 export interface dateFilter {
