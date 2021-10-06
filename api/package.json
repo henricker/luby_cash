@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@adonisjs/assembler": "^5.3.7",
+    "@types/jsonwebtoken": "^8.5.5",
     "@types/kafkajs": "^1.9.0",
     "@types/moment": "^2.13.0",
     "@types/source-map-support": "^0.5.4",
@@ -40,6 +41,7 @@
     "@adonisjs/lucid": "^16.0.2",
     "@adonisjs/repl": "^3.1.6",
     "axios": "^0.22.0",
+    "jsonwebtoken": "^8.5.1",
     "kafkajs": "^1.15.0",
     "luxon": "^2.0.2",
     "moment": "^2.29.1",
