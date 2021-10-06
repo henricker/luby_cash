@@ -77,17 +77,6 @@ export default class CustomerController {
     }
   }
 
-  public async store(request: Request, response: Response) {
-    try {
-      const data = request.body
-      const customer = await customerService.store({ ...data })
-  
-      return response.status(201).send({ customer: customer })
-    } catch(err) {
-      return response.status(400).send({ errors: [{ message: err.message }] })
-    }
-  }
-
   public async update(request: Request, response: Response) {
     try {
       const data = request.body
