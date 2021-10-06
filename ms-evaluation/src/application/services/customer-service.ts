@@ -1,6 +1,5 @@
 import Producer from "../../infra/kafka/producer";
 import Customer from "../entity/customer";
-import BcryptHelper from "../helpers/bcrypt";
 import { CustomerRepository } from "../repository/customer-repository";
 import { dateFilter } from "../repository/repository";
 
@@ -25,8 +24,7 @@ export class CustomerService {
     try {
       const status = this.evaluation(average_salary)
       const currentBalance = status ? 200 : 0
-      const passwordHashed = await BcryptHelper.hashing(password, 12)
-      const customer = await this.customerRepository.create({ full_name, phone, address, email, cpf_number, city, current_balance: currentBalance, state, zipcode, average_salary, status, created_at: new Date(), password: passwordHashed })
+      const customer = await this.customerRepository.create({ full_name, phone, address, email, cpf_number, city, current_balance: currentBalance, state, zipcode, average_salary, status, created_at: new Date(), password })
   
       const producer = new Producer()
       await producer.connect()
@@ -78,6 +76,15 @@ export class CustomerService {
   public async show(cpf: string) {
     const customer = await this.customerRepository.findByCPF(cpf)
     
+    if(!customer)
+      throw new Error('customer not found')
+
+    return customer
+  }
+
+  public async showByEmail(email: string) {
+    const customer = await this.customerRepository.findByEmail(email)
+
     if(!customer)
       throw new Error('customer not found')
 
