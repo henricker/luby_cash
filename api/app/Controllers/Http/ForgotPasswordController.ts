@@ -9,12 +9,11 @@ import moment from 'moment'
 export default class ForgotPasswordsController {
   public async storeAdmin({ request }: HttpContextContract) {
     const data = await request.validate(ForgotPasswordValidator)
-    const user = await Admin.findByOrFail('email', data.email)
+    const admin = await Admin.findByOrFail('email', data.email)
+    admin.rememberMeToken = crypto.randomBytes(12).toString('hex')
+    admin.rememberMeTokenCreatedAt = DateTime.now()
 
-    user.rememberMeToken = crypto.randomBytes(12).toString('hex')
-    user.rememberMeTokenCreatedAt = DateTime.now()
-
-    await user.save()
+    await admin.save()
 
     return 'Check the token in your email'
   }
