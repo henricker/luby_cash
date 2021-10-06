@@ -61,7 +61,7 @@ export abstract class Repository<T> {
         query += `${key}=$${index + 1}, `
       })
       query = query.replace(/, $/, ` WHERE id=$${values.length + 1} RETURNING *`)
-      console.log(query)      
+      console.log(query) 
       values.push(id)
       const result = await client.query(query, values)
       await client.end()
