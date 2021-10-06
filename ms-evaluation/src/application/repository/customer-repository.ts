@@ -8,6 +8,7 @@ export class CustomerRepository extends Repository<Customer> {
       const client = getClient()
       await client.connect()
       const query = `SELECT * FROM customer WHERE email = $1`
+      console.log(query)
       const values = [ email ]
       const result = await client.query(query, values)
       await client.end()
@@ -15,6 +16,7 @@ export class CustomerRepository extends Repository<Customer> {
       const customer = result.rows[0] ? new Customer({ ...result.rows[0] }) : undefined
       return customer
     } catch(err) {
+      console.log(err.message)
       throw new Error(err.message)
     }
   }
