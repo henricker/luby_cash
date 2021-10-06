@@ -12,8 +12,15 @@ Route.group(() => {
 }).prefix('/customers')
 
 Route.group(() => {
-  Route.patch('/', 'ForgotPasswordController.storeAdmin')
-  Route.patch('/recovery', 'ForgotPasswordController.updateAdmin')
+  Route.group(() => {
+    Route.patch('/', 'ForgotPasswordController.storeAdmin')
+    Route.patch('/recovery', 'ForgotPasswordController.updateAdmin')
+  }).prefix('/admins/')
+
+  Route.group(() => {
+    Route.patch('/', 'ForgotPasswordController.storeCustomer')
+    Route.patch('/recovery', 'ForgotPasswordController.updateCustomer')
+  }).prefix('/customers/')
 }).prefix('/forgot-password')
 
 Route.group(() => {
