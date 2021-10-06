@@ -74,7 +74,7 @@ export class CustomerService {
   }
  
   public async show(cpf: string) {
-    const customer = await this.customerRepository.findByCPF(cpf)
+    const customer = await this.customerRepository.findBy({ fieldName: 'cpf_number', fieldValue: cpf })
     
     if(!customer)
       throw new Error('customer not found')
@@ -83,13 +83,23 @@ export class CustomerService {
   }
 
   public async showByEmail(email: string) {
-    const customer = await this.customerRepository.findByEmail(email)
+    const customer = await this.customerRepository.findBy({ fieldName: 'email', fieldValue: email })
 
     if(!customer)
       throw new Error('customer not found')
 
     return customer
   }
+
+  public async showByToken(token: string) {
+    const customer = await this.customerRepository.findBy({ fieldName: 'remember_me_token', fieldValue: token })
+
+    if(!customer)
+      throw new Error('customer not found')
+
+    return customer
+  }
+
 
   private evaluation(averageSalary: number): boolean {
     return averageSalary < 500 ? false : true
