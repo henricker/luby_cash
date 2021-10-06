@@ -1,20 +1,19 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-// Route.post('/session', 'SessionController.store')
-
 Route.group(() => {
   Route.group(() => {
     Route.post('/', 'PixesController.store')
   })
     .prefix('/pixes')
-    .middleware(['auth'])
+    .middleware(['authCustomer'])
 
   Route.post('/', 'CustomerController.store')
+  Route.post('/session', 'SessionController.storeCustomer')
 }).prefix('/customers')
 
 Route.group(() => {
-  Route.patch('/', 'ForgotPasswordController.store')
-  Route.patch('/recovery', 'ForgotPasswordController.update')
+  Route.patch('/', 'ForgotPasswordController.storeAdmin')
+  Route.patch('/recovery', 'ForgotPasswordController.updateAdmin')
 }).prefix('/forgot-password')
 
 Route.group(() => {
