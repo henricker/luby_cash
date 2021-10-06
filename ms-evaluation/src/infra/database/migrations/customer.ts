@@ -19,7 +19,9 @@ class CreateUser {
       zipcode VARCHAR NOT NULL,
       current_balance DECIMAL(8, 2) NOT NULL,
       status BOOLEAN NOT NULL,
-      password VARCHAR NOT NULL, 
+      password VARCHAR NOT NULL,
+      remember_me_token VARCHAR DEFAULT NULL,
+      remember_me_token_created_at TIMESTAMP DEFAULT NULL,
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`
     await client.query(query)

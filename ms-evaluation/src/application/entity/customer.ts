@@ -8,6 +8,8 @@ interface ICreateCustomer {
   id?: number,
   created_at?: Date
   password: string
+  remember_me_token?: string
+  remember_me_token_created_at?: Date
 }
 
 export default class Customer {
@@ -26,17 +28,20 @@ export default class Customer {
   public current_balance: number
   public created_at?: Date
   public password: string
+  public remember_me_token?: string
+  public remember_me_token_created_at?: Date
   
-  constructor({ full_name, average_salary, cpf_number, email, status, id, created_at, current_balance, password }: ICreateCustomer) {
+  constructor({ full_name, average_salary, cpf_number, email, status, id, created_at, current_balance, password, remember_me_token, remember_me_token_created_at }: ICreateCustomer) {
     this.full_name = full_name
     this.email = email
     this.average_salary = average_salary
     this.cpf_number = cpf_number
     this.current_balance = 0
-    current_balance ? this.current_balance = current_balance : ''
-    created_at ? this.created_at = created_at : ''
+    current_balance ? this.current_balance = current_balance : undefined
+    created_at ? this.created_at = created_at : undefined
+    remember_me_token ? this.remember_me_token = remember_me_token : undefined
     this.status = status
-    id ? this.id = id : ''
+    id ? this.id = id : undefined
     this.password = password
   }
 }
