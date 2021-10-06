@@ -4,6 +4,7 @@ import axios from 'axios'
 import Env from '@ioc:Adonis/Core/Env'
 import Pix from 'App/Models/Pix'
 import Customer from '../../Models/interfaces/customer'
+import moment from 'moment'
 
 const MS_EVALUATION_ENDPOINT = Env.get('MS_EVALUATION_ENDPOINT')
 
@@ -11,18 +12,23 @@ export default class PixesController {
   public async store({ auth, request, response }: HttpContextContract) {
     const data = await request.validate(PixValidator)
 
-    const cpfIssuer = auth['cpf_number']
+    const customerIssuer: Customer = auth['customer']
     const cpfRecipient = data.cpf_recipient
     const transferValue = data['transfer_value']
 
     try {
-      const customerIssuer: Customer = (
-        await axios.get(MS_EVALUATION_ENDPOINT + `/customers/${cpfIssuer}`)
-      ).data['customer']
-
       const customerRecipient: Customer = (
         await axios.get(MS_EVALUATION_ENDPOINT + `/customers/${cpfRecipient}`)
       ).data['customer']
+
+      if (customerIssuer.cpf_number === customerRecipient.cpf_number) {
+        const err = new Error(
+          'cannot send or receive pix when customerIssuer and customerSender is the same person'
+        )
+        err['status'] = 400
+        err['code'] = 'BUSSINESS_LOGIC_EXCEPTION'
+        throw err
+      }
 
       if (!customerIssuer.status || !customerRecipient.status) {
         const err = new Error('cannot send or receive pix when customer has status disapproved')
@@ -45,9 +51,15 @@ export default class PixesController {
       customerRecipient['current_balance'] =
         Number.parseInt(String(customerRecipient.current_balance)) + transferValue
 
-      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, { ...customerIssuer })
+      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, {
+        id: customerIssuer.id,
+        current_balance: customerIssuer.current_balance,
+      })
 
-      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, { ...customerRecipient })
+      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, {
+        id: customerRecipient.id,
+        current_balance: customerRecipient.current_balance,
+      })
 
       const pix = await Pix.create({
         cpfIssuer: customerIssuer.cpf_number,
@@ -102,12 +114,16 @@ export default class PixesController {
         return response.send(pixesByUser)
       }
 
+      endDate = moment(endDate).add({ day: 1 })
+
       const pixesByUser = (
         await Pix.query()
           .where('created_at', '>', beginDate)
-          .andWhere('cpf_issuer', customer.cpf_number)
-          .orWhere('cpf_recipient', customer.cpf_number)
-          // .andWhere('created_at', '<', endDate)
+          .andWhere('created_at', '<=', endDate)
+          .andWhere((query) => {
+            query.where('cpf_issuer', customer.cpf_number)
+            query.orWhere('cpf_recipient', customer.cpf_number)
+          })
           .orderBy('id', 'desc')
           .paginate(page, perPage)
       ).serialize()
