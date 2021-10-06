@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'
 import { DateTime } from 'luxon'
 
-const MS_EVALUATION_ENDPOINT = 'http://localhost:3030'
+const MS_EVALUATION_ENDPOINT = Env.get('MS_EVALUATION_ENDPOINT')
 
 interface ResponseData {
   data: {
