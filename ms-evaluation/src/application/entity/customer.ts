@@ -1,6 +1,3 @@
-import bcrypt from 'bcrypt'
-import BcryptHelper from '../helpers/bcrypt'
-
 interface ICreateCustomer {
   full_name: string
   email: string
