@@ -57,6 +57,16 @@ export default class CustomerController {
     }
   }
 
+  public async showByEmail(request: Request, response: Response) {
+    const email = request.body.email
+    try {
+      const customer = await customerService.showByEmail(email)
+      return response.send({ customer: customer })
+    } catch(err) {
+      return response.status(400).send({ errors: [{ message: err.message }] })
+    }
+  }
+
   public async store(request: Request, response: Response) {
     try {
       const data = request.body
@@ -72,13 +82,13 @@ export default class CustomerController {
     try {
       const data = request.body
       const repository = new CustomerRepository()
-      const customer = new Customer({ ...data })
-      customer.password = undefined
-      customer.status = undefined
-      customer.id = undefined
-      customer.email = undefined
-      customer.cpf_number = undefined
-      const customerUpdated = await repository.update({ full_name: data.full_name }, data.id)
+      const customer: Partial<Customer> = {
+        full_name: data.full_name,
+        current_balance: data.current_balance,
+        average_salary: data.current_balance,
+      }
+
+      const customerUpdated = await repository.update({ ...customer  }, data.id)
 
       customerUpdated.password = undefined
       return response.status(200).send({ customer: customerUpdated })
