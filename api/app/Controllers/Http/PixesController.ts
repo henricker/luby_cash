@@ -1,87 +1,123 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { Status } from 'App/Models/enum/status'
-import Pix from 'App/Models/Pix'
-// import User from 'App/Models/User'
 import PixValidator from 'App/Validators/PixValidator'
+import axios from 'axios'
+import Env from '@ioc:Adonis/Core/Env'
+import Pix from 'App/Models/Pix'
+import Customer from '../../Models/interfaces/customer'
+
+const MS_EVALUATION_ENDPOINT = Env.get('MS_EVALUATION_ENDPOINT')
 
 export default class PixesController {
   public async store({ auth, request, response }: HttpContextContract) {
-    // const data = await request.validate(PixValidator)
-    // const userIssuer = await auth.use('api').authenticate()
+    const data = await request.validate(PixValidator)
 
-    // if (userIssuer.currentBalance < data.transfer_value)
-    //   return response
-    //     .status(400)
-    //     .send({ errors: [{ message: 'the current balance is less than the transfer amount' }] })
+    const cpfIssuer = auth['cpf_number']
+    const cpfRecipient = data.cpf_recipient
+    const transferValue = data['transfer_value']
 
-    // if (!userIssuer.status === null || userIssuer.status === Status.DISAPPROVED)
-    //   return response.status(400).send({
-    //     errors: [{ message: 'Cannot transfer when sender has no status or is disapproved' }],
-    //   })
+    try {
+      const customerIssuer: Customer = (
+        await axios.get(MS_EVALUATION_ENDPOINT + `/customers/${cpfIssuer}`)
+      ).data['customer']
 
-    // const userRecipient = await User.findByOrFail('cpfNumber', data.cpf_recipient)
+      const customerRecipient: Customer = (
+        await axios.get(MS_EVALUATION_ENDPOINT + `/customers/${cpfRecipient}`)
+      ).data['customer']
 
-    // if (userRecipient.id === userIssuer.id)
-    //   return response.status(400).send({ errors: [{ message: 'Unable to transfer to self' }] })
+      if (!customerIssuer.status || !customerRecipient.status) {
+        const err = new Error('cannot send or receive pix when customer has status disapproved')
+        err['status'] = 400
+        err['code'] = 'BUSSINESS_LOGIC_EXCEPTION'
+        throw err
+      }
 
-    // if (!userRecipient.status === null || userRecipient.status === Status.DISAPPROVED)
-    //   return response.status(400).send({
-    //     errors: [{ message: 'Cannot transfer when recipient has no status or is disapproved' }],
-    //   })
+      if (customerIssuer.current_balance < transferValue) {
+        const err = new Error(
+          'cannot send pix when the transfer value is greater than current_balance'
+        )
+        err['status'] = 400
+        err['code'] = 'BUSSINESS_LOGIC_EXCEPTION'
+        throw err
+      }
 
-    // userRecipient.currentBalance += data.transfer_value
-    // userIssuer.currentBalance -= data.transfer_value
+      customerIssuer['current_balance'] =
+        Number.parseInt(String(customerIssuer.current_balance)) - transferValue
+      customerRecipient['current_balance'] =
+        Number.parseInt(String(customerRecipient.current_balance)) + transferValue
 
-    // await userRecipient.save()
-    // await userIssuer.save()
+      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, { ...customerIssuer })
 
-    // await Pix.create({
-    //   transferValue: data.transfer_value,
-    //   issuerUser: userIssuer.id,
-    //   recipientUser: userRecipient.id,
-    // })
+      await axios.put(MS_EVALUATION_ENDPOINT + `/customers`, { ...customerRecipient })
 
-    return response.status(201).send('Transfer successful')
+      const pix = await Pix.create({
+        cpfIssuer: customerIssuer.cpf_number,
+        cpfRecipient: customerRecipient.cpf_number,
+        transferValue,
+      })
+
+      return response.status(201).send({ message: 'Transfer successful', pix })
+    } catch (err) {
+      if (err.message === 'Request failed with status code 404')
+        return response
+          .status(err.response.status)
+          .send({ errors: [{ message: err.response.data.errors[0].message }] })
+
+      if (err?.code === 'BUSSINESS_LOGIC_EXCEPTION')
+        return response.status(err.status).send({ errors: [{ message: err.message }] })
+    }
   }
 
-  public async index({ request, params, response }: HttpContextContract) {
-    // const userId = params.userId
+  public async index({ params, request, response }: HttpContextContract) {
+    const customerCPF = params.customerCPF
 
-    // let { page, perPage } = request.qs()
+    let { page, perPage, beginDate, endDate } = request.qs()
 
-    // //Add default values
-    // page = !page || page <= 0 ? 1 : Number(page)
-    // perPage = !perPage || perPage <= 0 ? 10 : Number(perPage)
+    //Add default values
+    page = !page || page <= 0 ? 1 : Number(page)
+    perPage = !perPage || perPage <= 0 ? 10 : Number(perPage)
 
-    // //Case page or perPage are NaN add default values
-    // page = Number.isNaN(page) ? 1 : page
-    // perPage = Number.isNaN(perPage) ? 10 : perPage
+    //Case page or perPage are NaN add default values
+    page = Number.isNaN(page) ? 1 : page
+    perPage = Number.isNaN(perPage) ? 10 : perPage
 
-    // const user = await User.findByOrFail('id', userId)
+    try {
+      const customer: Customer = (
+        await axios.get(MS_EVALUATION_ENDPOINT + `/customers/${customerCPF}`)
+      ).data['customer']
 
-    // const pixesByUser = (
-    //   await Pix.query()
-    //     .where('recipient_user', userId)
-    //     .orWhere('issuer_user', userId)
-    //     .orderBy('id', 'desc')
-    //     .preload('issuerUserModel')
-    //     .preload('recipientUserModel')
-    //     .paginate(page, perPage)
-    // ).serialize()
+      if (
+        !beginDate ||
+        !endDate ||
+        !/((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])/.test(beginDate) ||
+        !/((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])/.test(endDate)
+      ) {
+        const pixesByUser = (
+          await Pix.query()
+            .where('cpf_issuer', customer.cpf_number)
+            .orWhere('cpf_recipient', customer.cpf_number)
+            .orderBy('id', 'desc')
+            .paginate(page, perPage)
+        ).serialize()
 
-    // const transfers = pixesByUser.data.map((pix) => ({
-    //   transferId: pix.id,
-    //   nameIssuer: pix.issuerUserModel.full_name,
-    //   cpfIssuer: pix.issuerUserModel.cpf_number,
-    //   nameRecipient: pix.recipientUserModel.full_name,
-    //   cpfRecipient: pix.recipientUserModel.cpf_number,
-    //   transferValue: pix.transfer_value,
-    //   createdAt: pix.created_at,
-    // }))
+        return response.send(pixesByUser)
+      }
 
-    // pixesByUser.data = [{ client: user.fullName, currentBalance: user.currentBalance, transfers }]
+      const pixesByUser = (
+        await Pix.query()
+          .where('created_at', '>', beginDate)
+          .andWhere('cpf_issuer', customer.cpf_number)
+          .orWhere('cpf_recipient', customer.cpf_number)
+          // .andWhere('created_at', '<', endDate)
+          .orderBy('id', 'desc')
+          .paginate(page, perPage)
+      ).serialize()
 
-    // return response.send(pixesByUser)
-    return response.status(200)
+      return response.send(pixesByUser)
+    } catch (err) {
+      if (err.message === 'Request failed with status code 404')
+        return response
+          .status(err.response.status)
+          .send({ errors: [{ message: err.response.data.errors[0].message }] })
+    }
   }
 }
