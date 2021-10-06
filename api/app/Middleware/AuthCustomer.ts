@@ -2,6 +2,9 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import jwt from 'jsonwebtoken'
 import { AuthenticationException } from '@adonisjs/auth/build/standalone'
 import Env from '@ioc:Adonis/Core/Env'
+import axios from 'axios'
+
+const MS_EVALUATION_ENDPOINT = Env.get('MS_EVALUATION_ENDPOINT')
 
 export default class AuthCustomer {
   public async handle({ auth, request, response }: HttpContextContract, next: () => Promise<void>) {
@@ -21,6 +24,13 @@ export default class AuthCustomer {
     })
 
     if (!auth['cpf_number']) return
+
+    auth['customer'] = (
+      await axios.get(`${MS_EVALUATION_ENDPOINT}/customers/${auth['cpf_number']}`)
+    ).data['customer']
+
+    if (!auth['customer'])
+      return response.status(401).send({ errors: [{ message: 'customer not found' }] })
 
     await next()
   }
