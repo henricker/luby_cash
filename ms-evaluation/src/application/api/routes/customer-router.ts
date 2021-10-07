@@ -8,7 +8,6 @@ customerRouter.get('/customers', customerController.index)
 customerRouter.get('/customers/email/', customerController.showByEmail)
 customerRouter.get('/customers/token', customerController.showByToken)
 customerRouter.get('/customers/:cpf', customerController.show)
-customerRouter.post('/customers', customerController.store)
 customerRouter.put('/customers', customerController.update)
 
 export default customerRouter
